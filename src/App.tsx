@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import { api } from "./api";
+import SearchBar from "./components/SearchBar";
+import { Typography } from "@mui/material";
+import Result from "./components/Result";
 
 function App() {
+  const [cityName, setCityName] = useState<string>("");
+  const [data, setData] = useState<any>({})
+  console.log(data)
+
+  useEffect(() => {
+    if (cityName === "") return;
+    else {
+      const x = async () => {
+        await api.get(`?q=${cityName}`).then((res) => setData(res?.data));
+      };
+      x();
+    }
+  }, [cityName]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SearchBar setCityName={setCityName} />
+      {Object.keys(data).length !==0 && (
+        <>
+         <Typography textAlign='center'>{data?.name}, {data?.sys?.country}</Typography>
+         <Result data={data}/>
+        </>
+      )}
+     
+
     </div>
   );
 }
